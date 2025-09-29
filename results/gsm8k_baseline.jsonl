@@ -1,0 +1,2 @@
+{"id": "g1", "gold": 5, "pred": 5, "is_correct": true, "raw_completion": "<Starting with 2 apples, buying 3 more means adding 3 to 2, which equals 5.>\nFinal Answer: 5"}
+{"id": "g2", "gold": 6, "pred": 6, "is_correct": true, "raw_completion": "<John had 10 candies and ate 4, so subtract 4 from 10: 10 - 4 = 6. He has 6 candies left.>\nFinal Answer: 6"}

@@ -1,0 +1,6 @@
+{"id": "q1", "chosen_letter": "D", "chosen_position": 3, "gold_idx": 3, "is_correct": true, "raw_completion": "D", "shuffle_id": 0}
+{"id": "q1", "chosen_letter": "D", "chosen_position": 3, "gold_idx": 3, "is_correct": true, "raw_completion": "D", "shuffle_id": 1}
+{"id": "q1", "chosen_letter": "D", "chosen_position": 3, "gold_idx": 3, "is_correct": true, "raw_completion": "D", "shuffle_id": 2}
+{"id": "q2", "chosen_letter": "B", "chosen_position": 1, "gold_idx": 1, "is_correct": true, "raw_completion": "B", "shuffle_id": 0}
+{"id": "q2", "chosen_letter": "D", "chosen_position": 3, "gold_idx": 3, "is_correct": true, "raw_completion": "D", "shuffle_id": 1}
+{"id": "q2", "chosen_letter": "C", "chosen_position": 2, "gold_idx": 2, "is_correct": true, "raw_completion": "C", "shuffle_id": 2}
