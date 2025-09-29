@@ -1,0 +1,9 @@
+{
+  "model": "grok-4",
+  "temperature": 0.2,
+  "top_p": 1.0,
+  "seed": 7,
+  "max_output_tokens": 1024,
+  "system_prompt_path": "prompts/system.txt",
+  "cot_template_path": "prompts/cot_template.txt"
+}
