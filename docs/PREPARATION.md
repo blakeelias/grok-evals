@@ -5,7 +5,8 @@ I want to set up a code skeleton so I'm ready to hit the ground running when I s
 -code to generate a Markdown report of these accuracies in table-format.
 
 [ ] Let's have a discussion around the design of this codebase.
-[ ] Let's make a skeleton together and make some design choices along the way.
+[ ] What are some flaws in this current code skeleton that we might improve?
+[ ] Let's make/revise this skeleton together and make some design choices along the way.
 [ ] Let's implement the core API calling functionality.
         [ ] Since we'll be making many Grok requests, we might want to consider how to parallelize these for faster response.
             - E.g. is there any batch API that can allow us to submit many requests in a single HTTP request?
