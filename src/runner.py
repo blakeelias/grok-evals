@@ -29,15 +29,14 @@ class EvaluationItem(Generic[TResponse, TEvaluation]):
 
     This stores the complete evaluation pipeline for one item:
     - Input: example data, formatted prompt
-    - Model output: raw response, parsed structured response
-    - Evaluation: gold answer, evaluation result
+    - Model output: parsed structured response (Pydantic model)
+    - Evaluation: evaluation result
     - Metadata: IDs for tracking and grouping
     """
     item_id: str                              # Unique ID for this specific item
     group_id: Optional[str]                   # ID linking related items (e.g., shuffled variants)
     example: Dict[str, Any]                   # Original dataset example
     prompt: str                               # Formatted prompt sent to model
-    raw_response: Optional[str]               # Raw text from API (for debugging)
     parsed_response: Optional[TResponse]      # Structured response (Pydantic model)
     evaluation: Optional[TEvaluation]         # Evaluation result (type defined by benchmark)
     metadata: Dict[str, Any]                  # Extra info (shuffle_id, temperature, etc.)
@@ -49,7 +48,6 @@ class EvaluationItem(Generic[TResponse, TEvaluation]):
             "group_id": self.group_id,
             "example": self.example,
             "prompt": self.prompt,
-            "raw_response": self.raw_response,
             "metadata": self.metadata,
         }
 
@@ -183,7 +181,6 @@ class EvaluationRunner:
                 group_id=example.get('id', f'item_{i}'),  # Same as item_id for now
                 example=example,
                 prompt=benchmark.format_prompt(example),
-                raw_response=None,
                 parsed_response=None,
                 evaluation=None,
                 metadata={}
@@ -210,7 +207,6 @@ class EvaluationRunner:
                 )
 
                 item.parsed_response = parsed_response
-                item.raw_response = str(parsed_response)  # For now; update if client provides raw text
 
                 # Evaluate (may involve async LLM judge call)
                 evaluation = await benchmark.evaluate(parsed_response, item.example)
