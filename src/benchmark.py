@@ -13,8 +13,12 @@ from pydantic import BaseModel
 # Generic type variable for the response schema
 TResponse = TypeVar('TResponse', bound=BaseModel)
 
+# Generic type variable for the evaluation result
+# Can be bool for binary, Enum for categorical, or any custom type
+TEvaluation = TypeVar('TEvaluation')
 
-class Benchmark(ABC, Generic[TResponse]):
+
+class Benchmark(ABC, Generic[TResponse, TEvaluation]):
     """
     Abstract interface for an evaluation benchmark with structured outputs.
 
@@ -23,15 +27,16 @@ class Benchmark(ABC, Generic[TResponse]):
     correctness. Different benchmarks (MCQ, GSM8K, etc.) have different dataset formats,
     but all implement this common interface.
 
-    The generic type parameter TResponse specifies the Pydantic model that defines
-    the expected structure of model responses.
+    The generic type parameters are:
+    - TResponse: Pydantic model defining the structure of model responses
+    - TEvaluation: Type of evaluation result (bool, Enum, custom dataclass, etc.)
 
     The general evaluation flow is:
     1. load_dataset() yields raw examples in their native format
     2. format_prompt() converts each example into a model prompt
     3. response_schema() provides the Pydantic schema for structured outputs
     4. Model generates a structured response (handled by EvaluationRunner)
-    5. evaluate() checks if the structured response matches the gold answer
+    5. evaluate() checks response quality (may involve async LLM judge calls)
     """
 
     @abstractmethod
@@ -107,24 +112,56 @@ class Benchmark(ABC, Generic[TResponse]):
         pass
 
     @abstractmethod
-    def evaluate(self, response: TResponse, example: Dict[str, Any]) -> bool:
+    async def evaluate(self, response: TResponse, example: Dict[str, Any]) -> TEvaluation:
         """
-        Check if the structured response matches the gold answer.
+        Evaluate the quality of the structured response against the gold answer.
 
-        Compares the model's structured response against the ground truth from the
-        dataset example. The comparison logic is benchmark-specific (e.g., exact
-        match for MCQ, numerical equality for math problems).
+        This is an async method to support evaluation strategies that require LLM judge
+        calls (e.g., rubric-based grading, semantic equivalence checking). Simple
+        benchmarks can use synchronous logic and just wrap the return value in an
+        async function.
+
+        The return type TEvaluation is benchmark-specific and can be:
+        - bool: Simple binary correct/incorrect (MCQ, exact match)
+        - Enum: Categorical scores (e.g., CorrectnessLevel.FULL, PARTIAL, NONE)
+        - Dataclass: Structured evaluation with multiple dimensions
+        - Custom type: Any type that captures the evaluation semantics
 
         Args:
             response: Structured response from the model (instance of response_schema())
             example: The original dataset example containing the gold answer
 
         Returns:
-            True if the response is correct, False otherwise
+            Evaluation result of type TEvaluation
 
-        Example:
-            MCQ: response.answer="B", example["answer_idx"]=1 (B is index 1) -> True
-            GSM8K: response.final_answer=42, int(example["answer"])=42 -> True
+        Examples:
+            Binary evaluation (MCQ):
+                return response.answer == correct_letter  # Returns bool
+
+            Categorical evaluation (Math reasoning):
+                class MathScore(Enum):
+                    CORRECT_ANSWER_AND_REASONING = 3
+                    CORRECT_ANSWER_WRONG_REASONING = 2
+                    WRONG_ANSWER_VALID_APPROACH = 1
+                    COMPLETELY_WRONG = 0
+                return MathScore.CORRECT_ANSWER_AND_REASONING
+
+            Structured evaluation (Code generation):
+                @dataclass
+                class CodeEvaluation:
+                    passes_tests: bool
+                    follows_style: bool
+                    has_comments: bool
+                    reasoning_steps_correct: List[bool]
+                return CodeEvaluation(True, True, False, [True, True, False])
+
+            LLM-based judge (Essay grading):
+                # Make async LLM call to judge model
+                judge_response = await self.judge_client.complete(
+                    prompt=f"Grade this essay: {response.text}",
+                    schema=EssayGrade
+                )
+                return judge_response.grade  # Returns Enum from judge
         """
         pass
 
