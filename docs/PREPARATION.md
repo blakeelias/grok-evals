@@ -9,14 +9,16 @@ I want to set up a code skeleton so I'm ready to hit the ground running when I s
 [x] Let's make/revise this skeleton together and make some design choices along the way.
         [x] Better interfaces overall (Benchmark, Evaluation, etc.)
         [x] Use structured outputs for letter choices, numbers, etc.
-[ ] Let's implement the core API calling functionality.
-        [ ] Since we'll be making many Grok requests, we might want to consider how to parallelize these for faster response.
+[x] Let's implement the core API calling functionality.
+        [x] Since we'll be making many Grok requests, we might want to consider how to parallelize these for faster response.
             - E.g. is there any batch API that can allow us to submit many requests in a single HTTP request?
             - If that's not possible, perhaps just send multiple HTTP requests in parallel using multithreading or multiprocessing (like I did during the phone interview)?
             - Let's use [this example](https://docs.x.ai/docs/guides/async?utm_source=chatgpt.com) for asynchronous requests.
-        [ ] The Grok API says there's a way to cache prompt tokens. We maybe want to turn this on. How do we do this?
-            - (See this section of the docs: 
+            - ✅ Implemented using xAI's AsyncClient with EvaluationRunner managing parallel execution via asyncio.Semaphore
+        [x] The Grok API says there's a way to cache prompt tokens. We maybe want to turn this on. How do we do this?
+            - (See this section of the docs:
                   "Trying to run the same prompt multiple times? You can now use cached prompt tokens to incur less cost on repeated prompts. By reusing stored prompt data, you save on processing expenses for identical requests. Enable caching in your settings and start saving today! The caching is automatically enabled for all requests without user input. You can view the cached prompt token consumption in the "usage" object.")
+            - ✅ Prompt caching is automatically enabled by the xAI API - no additional configuration needed!
 
 [ ] Let's add an example dataset.
 [ ] Let's implement the first step of evaluation: run Grok on all the items from the dataset and collect results.

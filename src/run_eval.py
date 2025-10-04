@@ -9,7 +9,7 @@ import argparse
 import asyncio
 from typing import Any
 
-from .api import AsyncGrokClient
+from .api import GrokClient
 from .runner import EvaluationRunner
 from .benchmarks import MCQBenchmark, GSM8KBenchmark
 from .metrics import accuracy, wilson_ci
@@ -44,7 +44,7 @@ def compute_binary_accuracy(results: Any) -> tuple[float, float, float, int]:
 
 async def run_mcq_baseline(input_path: str, output_path: str):
     """Run MCQ baseline evaluation."""
-    client = AsyncGrokClient()
+    client = GrokClient()
     benchmark = MCQBenchmark()
     runner = EvaluationRunner(client, max_parallel=10)
 
@@ -58,7 +58,7 @@ async def run_mcq_baseline(input_path: str, output_path: str):
 
 async def run_gsm8k_baseline(input_path: str, output_path: str):
     """Run GSM8K baseline evaluation."""
-    client = AsyncGrokClient()
+    client = GrokClient()
     benchmark = GSM8KBenchmark()
     runner = EvaluationRunner(client, max_parallel=10)
 

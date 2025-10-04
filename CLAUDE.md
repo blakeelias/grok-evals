@@ -72,9 +72,9 @@ python -m src.eval_gsm8k self_consistency input.jsonl output.jsonl --samples 5
 
 ### Key Design Patterns
 
-1. **Evaluation Functions**: Each eval module has functions like `baseline()`, `robust()`, `self_consistency()` that take input/output paths
-2. **Client Abstraction**: `GrokClient` wraps OpenAI API for consistent model interaction across evaluations
-3. **Answer Extraction**: Format-specific parsers (e.g., `extract_letter()` for MCQ, `parse_final_answer()` for GSM8K)
+1. **Abstract Benchmark Interface**: All benchmarks implement `Benchmark[TResponse, TEvaluation]` with structured outputs
+2. **Client Abstraction**: `GrokClient` uses xAI's native AsyncClient for async parallel execution
+3. **Structured Outputs**: Pydantic schemas eliminate parsing - models return typed objects
 4. **Reproducibility**: Fixed seeds, explicit configuration, deterministic evaluation pipelines
 
 ### Configuration
