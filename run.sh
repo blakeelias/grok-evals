@@ -18,19 +18,24 @@ shift || true
 
 case "$cmd" in
   mcq-baseline)
-    python -m src.eval_mcq baseline "$@"
+    python -m src.run_eval mcq baseline "$@"
     ;;
   mcq-robust)
-    python -m src.eval_mcq robust "$@"
+    # TODO: Implement robust mode with new architecture
+    echo "mcq-robust not yet implemented in new architecture"
+    exit 1
     ;;
   gsm8k-baseline)
-    python -m src.eval_gsm8k baseline "$@"
+    python -m src.run_eval gsm8k baseline "$@"
     ;;
   gsm8k-format)
-    python -m src.eval_gsm8k format_strict "$@"
+    # With structured outputs, format is always strict
+    python -m src.run_eval gsm8k baseline "$@"
     ;;
   gsm8k-selfconsistency)
-    python -m src.eval_gsm8k self_consistency "$@"
+    # TODO: Implement self-consistency with new architecture
+    echo "gsm8k-selfconsistency not yet implemented in new architecture"
+    exit 1
     ;;
   *)
     echo "Unknown command: $cmd"
