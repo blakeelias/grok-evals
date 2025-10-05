@@ -22,6 +22,8 @@ In this work, I assess Grok on $\Tau^2$ bench and propose an extension that intr
 
 ## Benchmark Critique
 
+Both Tau-bench and Tau^2-bench have objectively verifiable domains. The agents can only take a constrained set of actions in a limited space -- e.g. booking certain flights. It seems it would be harder to express a more complex query like booking several flights at once that satisfy the user's broader constraints (e.g. mixing family and work travel). Is this really a good fit for my interests then in ambiguous human inputs
+
 By design, $\Tau^2$ assumes perfect goal alignment, in which the AI's challenge is execution rather than interpretation and exercising judgment. In practice, ambiguity and evolving human preferences are central to collaboration.
 
 
@@ -34,6 +36,12 @@ what they might do next if doing the task entirely by hand.
 * Better Methodology:  ??
 
 * New Test Cases or Scenarios
+
+
+Construct vague / ill-specified preferences, which nonetheless, upon checking the available results in the database, only have one clear, valid database state that's compatible with the preferences. This database state must be reached.
+
+Different amounts of trust could be placed. E.g. large set of acceptable solutions vs. small set. If large set, should agent just pick one? Is user in a rush? Or should agent explore with the user which solution is most preferred? Should it establish which solutions are on the Pareto-frontier and just expose those?
+
 
 "I propose extending τ²-bench into what could be called τ²-A: Human-in-the-Loop Ambiguity Evaluation. Whereas τ² assumes both participants share a fully specified goal and the challenge lies in coordinating tool use, τ²-A introduces structured uncertainty about the human’s intent. The AI must decide when to act autonomously, when to seek clarification, and how to minimize unnecessary interruptions—balancing efficiency with epistemic humility. Each scenario begins with a partially specified user request, with additional clarifying information available only through explicit “human query” tool calls. Performance is thus measured not only by task success but by how intelligently the agent manages communication: resolving ambiguity with minimal human effort and without premature assumptions. This turns evaluation from a static assessment of execution into a dynamic study of interactive reasoning, testing whether the model can adaptively collaborate with a human partner to uncover and satisfy evolving goals."
 
