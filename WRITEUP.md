@@ -16,9 +16,14 @@ If the AI agent had perfect knowledge of the human user's preferences, then in t
 
 If the AI had perfect understanding of the user's goals, then in principle a maximally-competent agent could autonomously complete a task satisfactorily with zero input from the user. However this is often not the case, which leads to an otherwise competent and capable AI system being of little value. As the saying goes: "if you want something done right, do it yourself." 
 
+In this work, I assess Grok on $\Tau^2$ bench and propose an extension that introduces ambiguity and measures how efficiently the model collaborates with humans to resolve uncertainty. 
+
 ## Grok Assessment
 
 ## Benchmark Critique
+
+By design, $\Tau^2$ assumes perfect goal alignment, in which the AI's challenge is execution rather than interpretation and exercising judgment. In practice, ambiguity and evolving human preferences are central to collaboration.
+
 
 The $\Tau^2$ benchmark does not include scenarios where the user intent is ambiguous which would require the AI agent to seek clarification. In $\Tau^2$, if the AI agent had access to all the same tools as the human, then in principle the agent could solve the entire problem itself and verify the outcome. However, the more realistic and challenging scenarios are those in which the user's intent is ambiguous and the user's subjective judgment is required to evaluate whether the task was completed satisfactorily. Here the agent's task is not only to predict the stream of tokens that a reasonable AI agent would say or do in a given scenario, but to predict what _this particular human_ will like or not, whether they will deem a given solution complete or ask for more refinement, and 
 what they might do next if doing the task entirely by hand.
@@ -29,6 +34,10 @@ what they might do next if doing the task entirely by hand.
 * Better Methodology:  ??
 
 * New Test Cases or Scenarios
+
+"I propose extending τ²-bench into what could be called τ²-A: Human-in-the-Loop Ambiguity Evaluation. Whereas τ² assumes both participants share a fully specified goal and the challenge lies in coordinating tool use, τ²-A introduces structured uncertainty about the human’s intent. The AI must decide when to act autonomously, when to seek clarification, and how to minimize unnecessary interruptions—balancing efficiency with epistemic humility. Each scenario begins with a partially specified user request, with additional clarifying information available only through explicit “human query” tool calls. Performance is thus measured not only by task success but by how intelligently the agent manages communication: resolving ambiguity with minimal human effort and without premature assumptions. This turns evaluation from a static assessment of execution into a dynamic study of interactive reasoning, testing whether the model can adaptively collaborate with a human partner to uncover and satisfy evolving goals."
+
+Human-in-the-loop Ambiguity Evaluation (HAE)
 
 I propose adding examples which require the AI agent to interpret vague human intent, ask for clarification, explore the environment and see what ambiguity it can resolve for itself, and judge when it has made sufficient progress to be worth checking back in with the human user.
 
@@ -49,11 +58,22 @@ and subsequently write a prompt for the AI agent containing a condensed version 
 
 * Better Metrics: ??
 
+Extending $\Tau^2$'s binary success metric to a continuous utility metric balancing correctness, efficiency and communication cost.
+
+"Better Metrics
+
+To capture this richer notion of collaboration, I propose replacing τ²’s binary success criterion with a continuous utility function that balances task correctness, efficiency, and communication cost. Each episode yields a composite reward:
+
+𝑅 = 𝛼𝑆−𝛽1𝐻−𝛽2𝑇−𝛽3𝐶
+
+where 𝑆 represents successful completion or partial credit for progress toward the goal, 𝐻 is the number of human interventions or clarification requests, 𝑇 measures total reasoning or execution time, and 𝐶 quantifies human communication effort (e.g., tokens typed or time spent responding). This metric rewards agents that are both effective and considerate collaborators—achieving high task success while minimizing human cognitive load. Unlike fixed accuracy metrics, this formulation evaluates how well the AI manages uncertainty and partnership dynamics, aligning performance assessment with real-world human preferences for systems that are helpful, efficient, and low-friction to work with."
+
 * Implementation Considerations:
 
 A study with real humans could have humans present realistic requests to an AI agent, provide a time-estimate of how long the task would take them if on their own, and then respond in a timed environment any time the AI agent requests their input.
 
 
+"Implementing the proposed τ²-A benchmark requires capturing realistic human input while maintaining reproducibility. Two complementary approaches can achieve this. First, in simulated-user mode, an auxiliary LLM acts as the human partner, holding a hidden “ground-truth” preference description while revealing only partial information through responses to clarification queries. This enables large-scale, deterministic evaluation of ambiguity resolution. Second, in human-study mode, real users provide authentic requests and clarifications in a timed environment, allowing direct measurement of communication cost and subjective satisfaction. Both modes can share the same infrastructure as τ²—tools, task APIs, and interaction logging—augmented with new tool-calls for requesting clarification and recording response metadata. By keeping the environment modular and extending τ²’s existing protocols, τ²-A remains technically compatible while introducing the crucial dimension of adaptive collaboration, making it feasible for both automated and human-centered evaluation at scale."
 
 
 ## Benchmark Implementation
@@ -82,4 +102,4 @@ A study with real humans could have humans present realistic requests to an AI a
 ## Conclusion
 
 
-In the long-term, there may be a pathway to optimally extracting human preferences and drives via neurotechnology or other wearables (e.g. Neuralink, EEG, or Silent Speech Recognition (SSR) technologies). As LLMs gain online-learning / continual-learning capabilities, there may be models which can more optimally pursue the objectives stated here. In the meantime we provide an offline method which aims to approximate these scenarios, via an evaluation metric which balances the three factors of correctness, speed, and the amount of human input required.
+In the long-term, there may be a pathway to optimally extracting human preferences and drives via neurotechnology or other wearables (e.g. Neuralink, EEG, or Silent Speech Recognition (SSR) technologies). As LLMs gain online-learning / continual-learning capabilities, there may be models which can more optimally pursue the objectives stated here. In the meantime we provide an offline method which aims to approximate these scenarios, via an evaluation metric which balances the three factors of correctness, speed, and the amount of human input required. Benchmarks that incorporate human-in-the-loop ambiguity resolution represent a birdge between today's offline training and evaluation methods and tomorrow's contunual, online learning which will leverage neuroadaptive interfaces.
