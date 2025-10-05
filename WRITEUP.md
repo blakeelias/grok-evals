@@ -20,6 +20,9 @@ In this work, I assess Grok on $\Tau^2$ bench and propose an extension that intr
 
 ## Grok Assessment
 
+ [ ] Assess where Grok succeeds / fails
+ [ ] Understand what multiple trials do, if temperature is set to 0.
+
 ## Benchmark Critique
 
 Both Tau-bench and Tau^2-bench have objectively verifiable domains. The agents can only take a constrained set of actions in a limited space -- e.g. booking certain flights. It seems it would be harder to express a more complex query like booking several flights at once that satisfy the user's broader constraints (e.g. mixing family and work travel). Is this really a good fit for my interests then in ambiguous human inputs
@@ -37,10 +40,32 @@ what they might do next if doing the task entirely by hand.
 
 * New Test Cases or Scenarios
 
+ [ ] Understand how database is structured, how actions are recorded, how states are checked
 
-Construct vague / ill-specified preferences, which nonetheless, upon checking the available results in the database, only have one clear, valid database state that's compatible with the preferences. This database state must be reached.
+ [ ] Construct vague / ill-specified preferences, which nonetheless, upon checking the available results in the database, only have one clear, valid database state that's compatible with the preferences. This database state must be reached.
 
-Different amounts of trust could be placed. E.g. large set of acceptable solutions vs. small set. If large set, should agent just pick one? Is user in a rush? Or should agent explore with the user which solution is most preferred? Should it establish which solutions are on the Pareto-frontier and just expose those?
+  * Modify database to have specific constraints / limited available flights that constrain the scope of what's possible to satisfy user's request
+  
+  * Satisfying user's exact request may not be possible. Yet it may be that user would accept something close enough, if the agent finds it and asks.
+    - Have hidden preference for this
+    - Create the true database state that's desired
+    - Create the initial request that seems to point to a certain set of possible database states
+    - Create a ranked list of database states in the order that the user desires them
+    - OR: create a utility function over database states, in terms of:
+      - departure time of day
+      - arrival time of day
+      - duration of trip
+      - day leaving
+      - (change in) ticket cost
+      - time spent on phone with agent
+
+ * Different amounts of trust could be placed. E.g. large set of acceptable solutions vs. small set. If large set, should agent just pick one? Is user in a rush? Or should agent explore with the user which solution is most preferred? Should it establish which solutions are on the Pareto-frontier and just expose those?
+
+   * Allow database to be in one of several valid states?
+
+ * Require tool-calls for user to check their calendar etc.?
+
+ * Compare grok-3 vs. grok-4 performance.
 
 
 "I propose extending τ²-bench into what could be called τ²-A: Human-in-the-Loop Ambiguity Evaluation. Whereas τ² assumes both participants share a fully specified goal and the challenge lies in coordinating tool use, τ²-A introduces structured uncertainty about the human’s intent. The AI must decide when to act autonomously, when to seek clarification, and how to minimize unnecessary interruptions—balancing efficiency with epistemic humility. Each scenario begins with a partially specified user request, with additional clarifying information available only through explicit “human query” tool calls. Performance is thus measured not only by task success but by how intelligently the agent manages communication: resolving ambiguity with minimal human effort and without premature assumptions. This turns evaluation from a static assessment of execution into a dynamic study of interactive reasoning, testing whether the model can adaptively collaborate with a human partner to uncover and satisfy evolving goals."
