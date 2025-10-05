@@ -107,9 +107,10 @@ You will be rewarded for your work according to the following rubric:
     - 𝛽1 measures the cost of context switching, i.e. $1 per context switch
     - 𝛽2 measures the cost of human waiting time: $20/hour * (1 hour / 3600 seconds) / (20 tokens / second) = $0.0002778 waiting per each LLM-generated token. (Realistic LLM decode speed is assumed to be [~20 tokens per second](https://www.reddit.com/r/LocalLLaMA/comments/162pgx9/comment/jxyeg54/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button), though higher speeds up to 50 tokens per second are also viable. We estimate human waiting time to be 1/5th of their full hourly rate -- i.e. we can imagine the time the human has an agent running takes about 1/5th of their brain-space, such that they could have up to 5 agents running simultaneously without losing track.)
     - 𝛽3 measures the cost per human token typed: $100/hour * (1 hour / 60 minutes) / (30 words/minute) (human typing speed) = $0.0556 / word (we assume human typing speed of 30 words / minute, which is the [average typing speed on mobile](https://en.wikipedia.org/wiki/Words_per_minute#:~:text=Karat%20et%20al.,to%20reach%20much%20higher%20speeds.) -- desktop typing or voice input would make this input rate higher -- can use 45 words per minute for desktop typing, or [150 words per minute for speaking](https://www.google.com/search?q=human+speaking+speed&oq=human+speaking+speed&gs_lcrp=EgZjaHJvbWUyBggAEEUYOdIBCDE5NDZqMGo0qAIAsAIA&sourceid=chrome&ie=UTF-8).)
- 
-This metric rewards you for being both an effective and considerate collaborator: achieving high task success while minimizing human cognitive load. 
-"
+This metric rewards you for being both an effective and considerate collaborator: achieving high task success while minimizing human cognitive load."
+
+The last parapgh of this prompt could optionally be withheld or included and be considered two separate modes of evaluation. This would allow testing whether the AI agent can achieve a higher score if it knows how it's being evaluated. It's also possible that this woludn't make a difference, which could either mean that the LLM is unable to effectively take such feedback into account, _or_ that the LLM already has a good appreciation for how to value its time versus the human's and that these instructions don't help.
+
 
 ## Benchmark Results
 
