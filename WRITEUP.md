@@ -135,6 +135,10 @@ what they might do next if doing the task entirely by hand.
 
 * New Test Cases or Scenarios
 
+The existing airline benchmark does not distinguish between a policy violation versus a user simply getting a suboptimal outcome. We extend the benchmark by allowing users to be flexible and accept multiple possible outcomes, where several possible outcomes can be graded as a 'pass' outcome, but where each outcome has a different reward amount. Whereas other failures like policy violations, or not getting into the acceptable set at all, count as failures. This incentivizes the agent not just to find any outcome which the user will agree to, but to be more proactive at finding the best outcome and truly delight the user, e.g. via strategies like offering the user multiple plausible options and asking which one they find best.
+
+TO-DO:
+
  [ ] Understand how database is structured, how actions are recorded, how states are checked
 
  [ ] Construct vague / ill-specified preferences, which nonetheless, upon checking the available results in the database, only have one clear, valid database state that's compatible with the preferences. This database state must be reached.
