@@ -21,29 +21,12 @@ In this work, I assess Grok on $\Tau^2$ bench and propose an extension that intr
 ## Grok Assessment
 
 
-### Run complete evaluation for all domains
-
-```
-tau2 run --domain retail --agent-llm gpt-4.1 --user-llm gpt-4.1 --num-trials 4 --save-to my_model_retail
-
-tau2 run --domain airline --agent-llm xai/grok-3-mini --user-llm xai/grok-3-mini --num-trials 4  --max-concurrency 50
-tau2 run --domain airline --agent-llm xai/grok-3 --user-llm xai/grok-3 --num-trials 4 --max-concurrency 50
-
-tau2 run --domain airline --agent-llm xai/grok-4-fast-reasoning --user-llm xai/grok-4-fast-reasoning --num-trials 4 --max-concurrency 50
-tau2 run --domain airline --agent-llm xai/grok-4 --user-llm xai/grok-4 --num-trials 4 --max-concurrency 50
-
-
-tau2 run --domain telecom --agent-llm gpt-4.1 --user-llm gpt-4.1 --num-trials 4 --save-to my_model_telecom
-```
-
 `grok-3-mini` and `grok-4-fast-reasoning` were compared, as these are more cost-effective than `grok-3` and `grok-4` respectively and would allow for more experimentation within the $100 budget.
 
-|-----------------------|--------|--------|--------|--------|
 |      Model            | Pass^1 | Pass^2 | Pass^3 | Pass^4 |
 |-----------------------|--------|--------|--------|--------|
 | Grok-3-mini           | 0.450  | 0.387  | 0.355  | 0.340  |
 | Grok-4-fast-reasoning | 0.545  | 0.487  | 0.450  | 0.420  |
-|-----------------------|--------|--------|--------|--------|
 
 ### Failure Breakdown by Component
 
@@ -315,6 +298,34 @@ In the long-term, there may be a pathway to optimally extracting human preferenc
 
 
 ## Appendix
+
+
+### Evaluation Commands
+
+The following commands were run to produce initial data on the models:
+
+```
+tau2 run --domain retail --agent-llm gpt-4.1 --user-llm gpt-4.1 --num-trials 4 --save-to my_model_retail
+
+tau2 run --domain airline --agent-llm xai/grok-3-mini --user-llm xai/grok-3-mini --num-trials 4  --max-concurrency 50
+tau2 run --domain airline --agent-llm xai/grok-3 --user-llm xai/grok-3 --num-trials 4 --max-concurrency 50
+
+tau2 run --domain airline --agent-llm xai/grok-4-fast-reasoning --user-llm xai/grok-4-fast-reasoning --num-trials 4 --max-concurrency 50
+tau2 run --domain airline --agent-llm xai/grok-4 --user-llm xai/grok-4 --num-trials 4 --max-concurrency 50
+
+
+tau2 run --domain telecom --agent-llm gpt-4.1 --user-llm gpt-4.1 --num-trials 4 --save-to my_model_telecom
+```
+
+
+The following commands were run to characterize failures in more detail:
+
+```
+tau2 analyze data/simulations/2025-10-06T06:29:29.611973_airline_llm_agent_grok-3-mini_user_simulator_grok-3-mini.json
+
+tau2 analyze data/simulations/2025-10-06T06:48:26.256501_airline_llm_agent_grok-4-fast-reasoning_user_simulator_grok-4-fast-reasoning.json
+```
+
 
 ### Results Summary
 
