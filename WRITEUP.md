@@ -130,12 +130,74 @@ what they might do next if doing the task entirely by hand.
 
 ## Benchmark Improvements
 
+### New Test Cases or Scenarios
 
-* Better Methodology:  ??
+The existing airline benchmark does not distinguish between a policy violation versus a user simply getting a suboptimal outcome (i.e. not their preferred one). We extend the benchmark by allowing users to be flexible and accept multiple possible outcomes, where several possible outcomes can be graded as a 'pass' outcome, but where each outcome has a different reward amount. Whereas other failures like policy violations, or not getting into the acceptable set at all, count as failures. This incentivizes the agent not just to find any outcome which the user will agree to, but to be more proactive at finding the best outcome and truly delight the user, e.g. via strategies like offering the user multiple plausible options and asking which one they find best.
 
-* New Test Cases or Scenarios
 
-The existing airline benchmark does not distinguish between a policy violation versus a user simply getting a suboptimal outcome. We extend the benchmark by allowing users to be flexible and accept multiple possible outcomes, where several possible outcomes can be graded as a 'pass' outcome, but where each outcome has a different reward amount. Whereas other failures like policy violations, or not getting into the acceptable set at all, count as failures. This incentivizes the agent not just to find any outcome which the user will agree to, but to be more proactive at finding the best outcome and truly delight the user, e.g. via strategies like offering the user multiple plausible options and asking which one they find best.
+As an example of such a relaxation, we show a relaxation of Task 8. The task originally had the following structure:
+
+╭───────────────────────────────────────────── Task Details ──────────────────────────────────────────────╮
+│ ID: 8                                                                                                   │
+│                                                                                                         │
+│ Purpose: Booking with extra passenger.                                                                  │
+│                                                                                                         │
+│ User Scenario:                                                                                          │
+│ Task Instructions: Domain: airline                                                                      │
+│ Reason for call:                                                                                        │
+│         You want to book a one-way flight from ORD to PHL on May 26.                                    │
+│ Known info:                                                                                             │
+│         Your name is Sophia Silva.                                                                      │
+│                                                                                                         │
+│         Your user id is sophia_silva_7557.                                                              │
+│ Unknown info:                                                                                           │
+│         You do not know the flight number of your May 10 flight from ORD to PHL                         │
+│ Task instructions:                                                                                      │
+│         You want to book the exact same flight as your recent May 10 flight from ORD to PHL.            │
+│                                                                                                         │
+│         You do not want any other flight.                                                               │
+│                                                                                                         │
+│         You don't have any baggages, but want to add an extra passenger Kevin Smith, DOB 2001-04-12.    │
+│                                                                                                         │
+│         You are ok with economy and want aisle and a middle seat together. You are willing to pay up to │
+│ $500 for the purchase.                                                                                  │
+│                                                                                                         │
+│         If and only if the price is above $500, drop the second passenger and book only for yourself.   │
+│                                                                                                         │
+│         If the agent asks, you only want a one-way ticket, not roundtrip.                               │
+│                                                                                                         │
+│         You don't need any travel insurance.                                                            │
+│                                                                                                         │
+│         You want to pay using only one of your certificates.                                            │
+│                                                                                                         │
+│         You do not accept any other mode of payment.                                                    │
+│                                                                                                         │
+│         Your birthday is in your user profile so you prefer not to provide it.                          │
+
+
+ "You want to book the exact same flight as your recent May 10 flight from ORD to PHL.\n\nYou do not want any other flight. \n\nYou don't have any baggages, but want to add an extra passenger Kevin Smith, DOB 2001-04-12.\n\nYou are ok with economy and want aisle and a middle seat together. You are willing to pay up to $500 for the purchase.\n\nIf and only if the price is above $500, drop the second passenger and book only for yourself.\n\nIf the agent asks, you only want a one-way ticket, not roundtrip.\n\nYou don't need any travel insurance.\n\nYou want to pay using only one of your certificates.\n\nYou do not accept any other mode of payment. \n\nYour birthday is in your user profile so you prefer not to provide it."
+
+Here, the user has two acceptable outcomes (A and B) in mind, where it is willing to accept option B if and only if option A is over-budget:
+
+  | Outcome        | Actions                                                 | Why                                                          |
+  |----------------|---------------------------------------------------------|--------------------------------------------------------------|
+  | A (Best)       | Book 2 passengers (Sophia Silva + Kevin Smith) for $348 | User gets their preferred outcome - traveling with companion |
+  | B (Acceptable) | Book 1 passenger (only Sophia Silva) for $174           | Fallback option if price > $500, user still travels          |
+
+However, because option A is within the user's budget and is preferred, the fallback of option B is considered wrong and would not get any reward in the current eval.
+
+Here we augment the task by lowering the budget from $500 to $300. Now, there is no available flight that meets all the user's stated criteria -- the user has to compromise on some dimension (either go slightly over budget, downgrade to lower cabin class, or travel without their companion). We make it such that there are three "close enough" flights that are acceptable under such a compromise, but with different rewards for how well they satisfy the compromise:
+
+  | Outcome | Config            | Cost | Reward | Why                                                              |
+  |---------|-------------------|------|--------|------------------------------------------------------------------|
+  | A       | 2 pax, basic econ | $166 | 1.0    | ✓ budget ✓ companion (requires agent to suggest cabin downgrade) |
+  | B       | 2 pax, economy    | $348 | 0.7    | ✓ companion ✓ preferred class, but over budget                   |
+  | C       | 1 pax, economy    | $174 | 0.5    | ✓ budget ✓ preferred class, but travels alone                    |
+
+We also modify the user's prompt to give them a clear ranked preference over these outcomes if given the choice, but willing to accept any of them if it's the only one the agent offers:
+
+"You want to book the exact same flight as your recent May 10 flight from ORD to PHL.\n\nYou do not want any other flight. \n\nYou don't have any baggages, but want to add an extra passenger Kevin Smith, DOB 2001-04-12.\n\nYou prefer economy class and want aisle and a middle seat together. Your preferred budget is up to $300 total for the purchase.\n\n**If the agent presents multiple options**, choose the one that best balances staying within budget while traveling with your companion. You're willing to downgrade to basic economy if it means staying within budget and traveling together.\n\nIf economy for 2 passengers is over budget **and the agent doesn't suggest basic economy**, you're willing to either: (a) pay the extra to travel together in economy, or (b) drop the second passenger and book solo in economy to stay within budget.\n\nIf the agent asks, you only want a one-way ticket, not roundtrip.\n\nYou don't need any travel insurance.\n\nYou want to pay using only one of your certificates.\n\nYou do not accept any other mode of payment. \n\nYour birthday is in your user profile so you prefer not to provide it."
+
 
 TO-DO:
 
@@ -167,6 +229,9 @@ TO-DO:
  * Require tool-calls for user to check their calendar etc.?
 
  * Compare grok-3 vs. grok-4 performance.
+
+
+* Better Methodology:  ??
 
 
 "I propose extending τ²-bench into what could be called τ²-A: Human-in-the-Loop Ambiguity Evaluation. Whereas τ² assumes both participants share a fully specified goal and the challenge lies in coordinating tool use, τ²-A introduces structured uncertainty about the human’s intent. The AI must decide when to act autonomously, when to seek clarification, and how to minimize unnecessary interruptions—balancing efficiency with epistemic humility. Each scenario begins with a partially specified user request, with additional clarifying information available only through explicit “human query” tool calls. Performance is thus measured not only by task success but by how intelligently the agent manages communication: resolving ambiguity with minimal human effort and without premature assumptions. This turns evaluation from a static assessment of execution into a dynamic study of interactive reasoning, testing whether the model can adaptively collaborate with a human partner to uncover and satisfy evolving goals."
@@ -316,13 +381,14 @@ In the long-term, there may be a pathway to optimally extracting human preferenc
 The following commands were run to produce initial data on the models:
 
 ```
-tau2 run --domain retail --agent-llm gpt-4.1 --user-llm gpt-4.1 --num-trials 4 --save-to my_model_retail
+
+source .venv/bin/activate
 
 tau2 run --domain airline --agent-llm xai/grok-3-mini --user-llm xai/grok-3-mini --num-trials 4  --max-concurrency 50
 tau2 run --domain airline --agent-llm xai/grok-3 --user-llm xai/grok-3 --num-trials 4 --max-concurrency 50
 
-tau2 run --domain airline --agent-llm xai/grok-4-fast-reasoning --user-llm xai/grok-4-fast-reasoning --num-trials 4 --max-concurrency 50
-tau2 run --domain airline --agent-llm xai/grok-4 --user-llm xai/grok-4 --num-trials 4 --max-concurrency 50
+tau2 run --domain airline --agent-llm xai/grok-4-fast-reasoning --user-llm xai/grok-4-fast-reasoning --num-trials 4 --max-concurrency 25; \
+tau2 run --domain airline --agent-llm xai/grok-4 --user-llm xai/grok-4 --num-trials 4 --max-concurrency 25
 
 
 tau2 run --domain telecom --agent-llm gpt-4.1 --user-llm gpt-4.1 --num-trials 4 --save-to my_model_telecom
