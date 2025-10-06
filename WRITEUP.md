@@ -35,21 +35,25 @@ We can further break down failures based on whether they were from incorrect com
 `grok-3-mini`:
 
 Failure Breakdown by Component:
+```
 ┏━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
 ┃ Component     ┃ Failures ┃ % of Failures ┃
 ┡━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
 │ Communication │       21 │         19.1% │
 │ Database      │      107 │         97.3% │
 └───────────────┴──────────┴───────────────┘
+```
 
 `grok-4-fast-reasoning`:
 Failure Breakdown by Component:
+```
 ┏━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
 ┃ Component     ┃ Failures ┃ % of Failures ┃
 ┡━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
 │ Communication │       13 │         14.3% │
 │ Database      │       91 │        100.0% │
 └───────────────┴──────────┴───────────────┘
+```
 
 ### Failure Breakdown by Action Type
 
@@ -58,24 +62,27 @@ We can be more specific and compare based on which agent actions get executed su
 `grok-3-mini`:
 
 Agent Actions (worst performing):
+```
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━┳━━━━━━━┓
 ┃ Action                        ┃ Success ┃ Total ┃  Rate ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━╇━━━━━━━┩
-│ calculate                     │       0 │     4 │  0.0% │
-│ transfer_to_human_agents      │       0 │     4 │  0.0% │
-│ send_certificate              │       0 │    12 │  0.0% │
-│ update_reservation_baggages   │       2 │    24 │  8.3% │
-│ cancel_reservation            │       6 │    52 │ 11.5% │
+│ calculate                     │       0 │     4 │  0.0% |
+│ transfer_to_human_agents      │       0 │     4 │  0.0% |
+│ send_certificate              │       0 │    12 │  0.0% |
+│ update_reservation_baggages   │       2 │    24 │  8.3% |
+│ cancel_reservation            │       6 │    52 │ 11.5% |
 │ search_direct_flight          │      13 │    80 │ 16.2% │
 │ book_reservation              │       6 │    35 │ 17.1% │
 │ update_reservation_flights    │      16 │    84 │ 19.0% │
 │ update_reservation_passengers │       4 │    12 │ 33.3% │
 │ get_reservation_details       │     121 │   228 │ 53.1% │
 └───────────────────────────────┴─────────┴───────┴───────┘
+```
 
 `grok-4-fast-reasoning`:
 
  Agent Actions (worst performing):
+```
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━┳━━━━━━━┓
 ┃ Action                        ┃ Success ┃ Total ┃  Rate ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━╇━━━━━━━┩
@@ -90,7 +97,7 @@ Agent Actions (worst performing):
 │ update_reservation_passengers │      10 │    12 │ 83.3% │
 │ get_user_details              │      54 │    56 │ 96.4% │
 └───────────────────────────────┴─────────┴───────┴───────┘
-
+```
 
 
 We can see that from `grok-3-mini` to `grok-4-fast-reasoning`, there has been an improvement in the variety of actions the agent can take successfully, and the frequency of success at each action. The success rate across many actions has gone up significantly, e.g. `update_reservation_baggages` jumping from 8.3% to 45.8%, while for other actions there has even been a regression (e.g. `book_reservation` dropping from 17.1% to 16.7%).
