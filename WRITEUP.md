@@ -21,16 +21,16 @@ In this work, I assess Grok on $\Tau^2$ bench and propose an extension that intr
 ## Grok Assessment
 
 
-# Example: Run complete evaluation for all domains
+### Run complete evaluation for all domains
 
 ```
 tau2 run --domain retail --agent-llm gpt-4.1 --user-llm gpt-4.1 --num-trials 4 --save-to my_model_retail
 
 tau2 run --domain airline --agent-llm xai/grok-3-mini --user-llm xai/grok-3-mini --num-trials 4  --max-concurrency 50
-tau2 run --domain airline --agent-llm xai/grok-3 --user-llm xai/grok-3 --num-trials 1 --max-concurrency 50
+tau2 run --domain airline --agent-llm xai/grok-3 --user-llm xai/grok-3 --num-trials 4 --max-concurrency 50
 
 tau2 run --domain airline --agent-llm xai/grok-4-fast-reasoning --user-llm xai/grok-4-fast-reasoning --num-trials 4 --max-concurrency 50
-tau2 run --domain airline --agent-llm xai/grok-4 --user-llm xai/grok-4 --num-trials 1 --max-concurrency 50
+tau2 run --domain airline --agent-llm xai/grok-4 --user-llm xai/grok-4 --num-trials 4 --max-concurrency 50
 
 
 tau2 run --domain telecom --agent-llm gpt-4.1 --user-llm gpt-4.1 --num-trials 4 --save-to my_model_telecom
@@ -45,9 +45,81 @@ tau2 run --domain telecom --agent-llm gpt-4.1 --user-llm gpt-4.1 --num-trials 4 
 | Grok-4-fast-reasoning | 0.545  | 0.487  | 0.450  | 0.420  |
 |-----------------------|--------|--------|--------|--------|
 
+### Failure Breakdown by Component
+
+We can further break down failures based on whether they were from incorrect communication or incorrect database results (or both). We see that almost all of the failures come from the database itself having incorrect results at the end of the trajectory. A smaller fraction of the failures additionally have a communication failure which would additionally need to be resolved in order for the task to be counted as successful.
+
+`grok-3-mini`:
+
+Failure Breakdown by Component:
+┏━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Component     ┃ Failures ┃ % of Failures ┃
+┡━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ Communication │       21 │         19.1% │
+│ Database      │      107 │         97.3% │
+└───────────────┴──────────┴───────────────┘
+
+`grok-4-fast-reasoning`:
+Failure Breakdown by Component:
+┏━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Component     ┃ Failures ┃ % of Failures ┃
+┡━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ Communication │       13 │         14.3% │
+│ Database      │       91 │        100.0% │
+└───────────────┴──────────┴───────────────┘
+
+### Failure Breakdown by Action Type
+
+We can be more specific and compare based on which agent actions get executed successfully vs. not.
+
+`grok-3-mini`:
+
+Agent Actions (worst performing):
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃ Action                        ┃ Success ┃ Total ┃  Rate ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ calculate                     │       0 │     4 │  0.0% │
+│ transfer_to_human_agents      │       0 │     4 │  0.0% │
+│ send_certificate              │       0 │    12 │  0.0% │
+│ update_reservation_baggages   │       2 │    24 │  8.3% │
+│ cancel_reservation            │       6 │    52 │ 11.5% │
+│ search_direct_flight          │      13 │    80 │ 16.2% │
+│ book_reservation              │       6 │    35 │ 17.1% │
+│ update_reservation_flights    │      16 │    84 │ 19.0% │
+│ update_reservation_passengers │       4 │    12 │ 33.3% │
+│ get_reservation_details       │     121 │   228 │ 53.1% │
+└───────────────────────────────┴─────────┴───────┴───────┘
+
+`grok-4-fast-reasoning`:
+
+ Agent Actions (worst performing):
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃ Action                        ┃ Success ┃ Total ┃  Rate ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ calculate                     │       0 │     4 │  0.0% │
+│ transfer_to_human_agents      │       0 │     4 │  0.0% │
+│ send_certificate              │       1 │    12 │  8.3% │
+│ book_reservation              │       6 │    36 │ 16.7% │
+│ cancel_reservation            │      15 │    52 │ 28.8% │
+│ update_reservation_baggages   │      11 │    24 │ 45.8% │
+│ search_direct_flight          │      39 │    80 │ 48.8% │
+│ update_reservation_flights    │      52 │    84 │ 61.9% │
+│ update_reservation_passengers │      10 │    12 │ 83.3% │
+│ get_user_details              │      54 │    56 │ 96.4% │
+└───────────────────────────────┴─────────┴───────┴───────┘
+
+
+
+We can see that from `grok-3-mini` to `grok-4-fast-reasoning`, there has been an improvement in the variety of actions the agent can take successfully, and the frequency of success at each action. The success rate across many actions has gone up significantly, e.g. `update_reservation_baggages` jumping from 8.3% to 45.8%, while for other actions there has even been a regression (e.g. `book_reservation` dropping from 17.1% to 16.7%).
+
+We can also see that there are some actions which neither `grok-3-mini` nor `grok-4-fast-reasoning` are successful with -- both models had no success taking the `calculate` or `transfer_to_human_agents` actions when expected, and are rarely successful with the `send_certificate` action. (Though notably, `grok-4-fast-reasoning` _has_ taken the `transfer_to_human_agents` action in [some trajectories]((#example-2--overly-pessimistic), just at an inappropriate time, i.e. when it's being overly pessimistic. But it never successfully took this action in the appropriate and expected instances.)
+
+
+
+
 Grok does well overall at understanding the user's request and intent, and taking initial actions that make progress on the user's needs. Grok is flexible about which starting information it can work from, using any available information the user provides in their initial message. For example, if the user's initial message includes their flight details, the agent will look this up right away, even if it doesn't know other details (i.e. name or user information to look up their account.)
 
-However, Grok at times will fail to follow through perfectly on certain details of the request. Grok-4-fast-reasoning struggles with knowing how strongly to follow the policy constraints. In one example, it did a calculation in its head (correctl!) rather than following the policy of using a calculator tool for all calculations. In another example, it exited prematurely when a user's request could not be satisfied due to a policy violation, rather than telling this to the user and seeing if there was anything else it could do.
+However, Grok at times will fail to follow through perfectly on certain details of the request. Grok-4-fast-reasoning struggles with knowing how strongly to follow the policy constraints. In [Example 3](#example-3--fails-to-calculate-using-tool), it did a calculation in its head (correctly!) rather than following the policy of using a calculator tool for all calculations. In [Example 2](#example-2--overly-pessimistic), it exited prematurely when a user's request could not be satisfied due to a policy violation, rather than telling this to the user and seeing if there was anything else it could do. Some failures, however, are even worse, e.g. [Example 1](#example-1-charged-user-wrong-amount) shows that the agent booked an entirely wrong flight for the user that was way outside their budget, even after having agreed.
 
 
  [ ] Assess where Grok succeeds / fails
@@ -244,7 +316,9 @@ In the long-term, there may be a pathway to optimally extracting human preferenc
 
 ## Appendix
 
-### Grok-3-mini raw results
+### Results Summary
+
+#### Grok-3-mini results
 
 1. Task: 0 | Trial: 0 | Reward: ✅ | Duration: 44.90s | DB Match: YES | 
 2. Task: 0 | Trial: 1 | Reward: ✅ | Duration: 81.40s | DB Match: YES | 
@@ -447,7 +521,7 @@ In the long-term, there may be a pathway to optimally extracting human preferenc
 199. Task: 9 | Trial: 2 | Reward: ❌ | Duration: 92.68s | DB Match: NO | 
 200. Task: 9 | Trial: 3 | Reward: ❌ | Duration: 61.85s | DB Match: NO |
 
-### Grok-4-fast-reasoning results
+#### Grok-4-fast-reasoning results
 
 1. Task: 0 | Trial: 0 | Reward: ✅ | Duration: 22.15s | DB Match: YES | 
 2. Task: 0 | Trial: 1 | Reward: ✅ | Duration: 18.00s | DB Match: YES | 
@@ -652,9 +726,12 @@ In the long-term, there may be a pathway to optimally extracting human preferenc
 
 
 
-### Grok-4-reasoning-fast failures
 
-#### Example 1: Charged User Wrong Amount
+### Specific Failures
+
+#### Grok-4-reasoning-fast failures
+
+##### Example 1: Charged User Wrong Amount
 
 In this instance, the agent (`grok-4-fast-reasoning`) made a mistake by charging more than what the user had said they were willing to pay.
 
@@ -1175,7 +1252,7 @@ Simulation Details:
 
 
 
-#### Example 2:  Overly Pessimistic
+##### Example 2:  Overly Pessimistic
 
 In this example, the user's initial request would be against policy. However, instead of telling the user that this is against policy and asking if there's anything else they can do, the agent immediately transfers to a human agent. It turns out that the human would have preferred an alternative option in the case where their original request wasn't allowed, and this was expected as the outcome. Here, Grok failed to engage in meaningful dialogue to discover the way it could be most helpful.
 
@@ -1317,7 +1394,7 @@ Simulation Details:
 ```
 
 
-#### Example 3:  Fails to Calculate Using Tool
+##### Example 3:  Fails to Calculate Using Tool
 
 In this example, the agent does everything correctly from the user's perspective and gets the user onto the correct flight. However, the agent neglected to calculate the updated price using a tool call, and instead uses its own thinking ability to calculate the price directly. (It happens to calculate the price correctly, but this is still against the policy.)
 
