@@ -102,7 +102,7 @@ Agent Actions (worst performing):
 
 We can see that from `grok-3-mini` to `grok-4-fast-reasoning`, there has been an improvement in the variety of actions the agent can take successfully, and the frequency of success at each action. The success rate across many actions has gone up significantly, e.g. `update_reservation_baggages` jumping from 8.3% to 45.8%, while for other actions there has even been a regression (e.g. `book_reservation` dropping from 17.1% to 16.7%).
 
-We can also see that there are some actions which neither `grok-3-mini` nor `grok-4-fast-reasoning` are successful with -- both models had no success taking the `calculate` or `transfer_to_human_agents` actions when expected, and are rarely successful with the `send_certificate` action. (Though notably, `grok-4-fast-reasoning` _has_ taken the `transfer_to_human_agents` action in [some trajectories]((#example-2--overly-pessimistic), just at an inappropriate time, i.e. when it's being overly pessimistic. But it never successfully took this action in the appropriate and expected instances.)
+We can also see that there are some actions which neither `grok-3-mini` nor `grok-4-fast-reasoning` are successful with -- both models had no success taking the `calculate` or `transfer_to_human_agents` actions when expected, and are rarely successful with the `send_certificate` action. (Though notably, `grok-4-fast-reasoning` _has_ taken the `transfer_to_human_agents` action in [some trajectories](#example-2--overly-pessimistic), just at an inappropriate time, i.e. when it's being overly pessimistic. But it never successfully took this action in the appropriate and expected instances.)
 
 
 
